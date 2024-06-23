@@ -9,6 +9,7 @@ type CreateUserRequest struct {
 
 // CreateAuctionRequest is the model generated from a request to POST /api/auction
 type CreateAuctionRequest struct {
+	ID          string
 	OwnerID     string
 	Title       string
 	Description string
@@ -23,6 +24,9 @@ type StartAuctionRequest struct {
 
 // RegisterAuctionRequest is the model generated from a request to PUT /api/auction
 type RegisterAuctionRequest struct {
-	AuctionID string
-	BidderID  string
+	ID            string
+	AuctionID     string
+	BidderID      string
+	MaxBid        int
+	AutoIncrement int
 }

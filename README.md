@@ -2,7 +2,7 @@
 This repo is my implementation of the Dispatch take-home challenge.
 
 ## REST API
-This Go module exposes multiple REST endpoints for managing users and their relationships with auctions.
+This Go module contains code for exposing multiple REST endpoints for managing users and their relationships with auctions. Note: This is a POC, and the REST API is not fully functional. To run tests against the main algorithm, run `cd /internal/logic && go test`
 
 ### POST /api/user
 Creates a new user.
@@ -148,7 +148,7 @@ updated_at: timestamp
 Stores a record for each auction.
 **Columns:**
 id (PK): uuid
-owner_id: uuid
+owner_id (FK): uuid
 title: string
 description: string
 images: json_blob
@@ -163,20 +163,11 @@ Stores a record for each bidder in an auction.
 id (PK): uuid
 auction_id (FK): uuid
 bidder_id (FK): uuid
+initial_bid: int
+max_bid: int
+auto_increment: int
 created_at: timestamp
 updated_at: timestamp
-
-### table: bids
-Stores a record each time a user bids in an auction
-**Columns:**
-id (PK): uuid
-auction_id (FK): uuid
-bidder_id (FK): uuid
-max_bid: int32
-current_bid: int32
-auto_increment: int32
-created_at: timestamp
-
 
 ## Future Enhancements
 * Hash the password before storing it in the database
@@ -191,3 +182,4 @@ created_at: timestamp
 * Give the auction owner the ability to cancel the auction
 * Give the auction owner the ability to set a start time for the auction instead of manually starting.
 * Use an actual postgres database that can be persisted between runs
+* Login endpoint for existing users

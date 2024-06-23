@@ -9,22 +9,31 @@ import (
 	"strings"
 
 	"dispatch-auction/internal/logic"
-	"dispatch-auction/internal/model"
+	"dispatch-auction/internal/share/model"
 )
 
 const apiRoot = "/api"
 
-// SetupRESTHandlers initializes handler functions for each REST API route
-func SetupRESTHandlers() {
-	// POST
-	http.HandleFunc(fmt.Sprintf("%s/user", apiRoot), handleUserRequest)
-	// POST + PUT
-	http.HandleFunc(fmt.Sprintf("%s/auction", apiRoot), handleAuctionRequest)
-	// POST
-	http.HandleFunc(fmt.Sprintf("%s/auction", apiRoot), handleAuctionRegisterRequest)
+type handler struct {
+	logic *logic.Logic
 }
 
-func handleUserRequest(w http.ResponseWriter, r *http.Request) {
+// SetupRESTHandlers initializes handler functions for each REST API route
+func SetupRESTHandlers(logic *logic.Logic) {
+	h := handler{logic: logic}
+
+	// POST
+	http.HandleFunc(fmt.Sprintf("%s/user", apiRoot), h.handleUserRequest)
+	log.Printf("initialized %s/user REST handler\n", apiRoot)
+	// POST + PUT
+	http.HandleFunc(fmt.Sprintf("%s/auction", apiRoot), h.handleAuctionRequest)
+	log.Printf("initialized %s/auction REST handler\n", apiRoot)
+	// POST
+	http.HandleFunc(fmt.Sprintf("%s/auction/register", apiRoot), h.handleAuctionRegisterRequest)
+	log.Printf("initialized %s/auction/register REST handler\n", apiRoot)
+}
+
+func (h handler) handleUserRequest(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 	if contentType != "" {
 		mediaType := strings.ToLower(strings.TrimSpace(strings.Split(contentType, ";")[0]))
@@ -43,13 +52,13 @@ func handleUserRequest(w http.ResponseWriter, r *http.Request) {
 		var userRequest model.CreateUserRequest
 		err := dec.Decode(&userRequest)
 		if err != nil {
-			fmt.Fprintf(w, "{\"error\": \"%w\"}", err)
+			fmt.Fprintf(w, "{\"error\": \"%s\"}", err)
 			return
 		}
 
-		response, err := logic.CreateUser(userRequest)
+		response, err := h.logic.CreateUser(userRequest)
 		if err != nil {
-			fmt.Fprintf(w, "{\"error\": \"%w\"}", err)
+			fmt.Fprintf(w, "{\"error\": \"%s\"}", err)
 			return
 		}
 		json.NewEncoder(w).Encode(response)
@@ -58,7 +67,7 @@ func handleUserRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleAuctionRequest(w http.ResponseWriter, r *http.Request) {
+func (h handler) handleAuctionRequest(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 	if contentType != "" {
 		mediaType := strings.ToLower(strings.TrimSpace(strings.Split(contentType, ";")[0]))
@@ -77,13 +86,13 @@ func handleAuctionRequest(w http.ResponseWriter, r *http.Request) {
 		var createAuctionRequest model.CreateAuctionRequest
 		err := dec.Decode(&createAuctionRequest)
 		if err != nil {
-			fmt.Fprintf(w, "{\"error\": \"%w\"}", err)
+			fmt.Fprintf(w, "{\"error\": \"%s\"}", err)
 			return
 		}
 
-		response, err := logic.CreateAuction(createAuctionRequest)
+		response, err := h.logic.CreateAuction(createAuctionRequest)
 		if err != nil {
-			fmt.Fprintf(w, "{\"error\": \"%w\"}", err)
+			fmt.Fprintf(w, "{\"error\": \"%s\"}", err)
 			return
 		}
 		json.NewEncoder(w).Encode(response)
@@ -93,13 +102,13 @@ func handleAuctionRequest(w http.ResponseWriter, r *http.Request) {
 		var startAuctionRequest model.StartAuctionRequest
 		err := dec.Decode(&startAuctionRequest)
 		if err != nil {
-			fmt.Fprintf(w, "{\"error\": \"%w\"}", err)
+			fmt.Fprintf(w, "{\"error\": \"%s\"}", err)
 			return
 		}
 
-		response, err := logic.StartAuction(startAuctionRequest)
+		response, err := h.logic.StartAuction(startAuctionRequest)
 		if err != nil {
-			fmt.Fprintf(w, "{\"error\": \"%w\"}", err)
+			fmt.Fprintf(w, "{\"error\": \"%s\"}", err)
 			return
 		}
 		json.NewEncoder(w).Encode(response)
@@ -108,7 +117,7 @@ func handleAuctionRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleAuctionRegisterRequest(w http.ResponseWriter, r *http.Request) {
+func (h handler) handleAuctionRegisterRequest(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 	if contentType != "" {
 		mediaType := strings.ToLower(strings.TrimSpace(strings.Split(contentType, ";")[0]))
@@ -127,13 +136,13 @@ func handleAuctionRegisterRequest(w http.ResponseWriter, r *http.Request) {
 		var auctionRegisterRequest model.RegisterAuctionRequest
 		err := dec.Decode(&auctionRegisterRequest)
 		if err != nil {
-			fmt.Fprintf(w, "{\"error\": \"%w\"}", err)
+			fmt.Fprintf(w, "{\"error\": \"%s\"}", err)
 			return
 		}
 
-		response, err := logic.RegisterAuction(auctionRegisterRequest)
+		response, err := h.logic.RegisterAuction(auctionRegisterRequest)
 		if err != nil {
-			fmt.Fprintf(w, "{\"error\": \"%w\"}", err)
+			fmt.Fprintf(w, "{\"error\": \"%s\"}", err)
 			return
 		}
 		json.NewEncoder(w).Encode(response)
